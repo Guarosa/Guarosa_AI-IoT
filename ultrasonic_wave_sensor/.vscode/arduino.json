@@ -1,0 +1,5 @@
+{
+    "sketch": "ultrasonic_wave_op/app.ino",
+    "board": "arduino:avr:uno",
+    "port": "COM3"
+}
