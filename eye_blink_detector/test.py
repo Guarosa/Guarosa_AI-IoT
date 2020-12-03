@@ -5,7 +5,7 @@ from keras.models import load_model
 from datetime import datetime
 import MySQLdb
 
-db = MySQLdb.connect(db="grs", host="grs-js.cjidgocmm9f1.us-east-1.rds.amazonaws.com",port=3306,  user="grs", passwd="grs1234!",
+db = MySQLdb.connect(db="your db", host="your host",port=3306,  user="your user", passwd="your password",
 charset='utf8')
 cursor = db.cursor()
 temp = datetime.now()
@@ -109,13 +109,12 @@ while cap.isOpened():
         # 눈깜빡했을 때 실행
         now = datetime.now()
         if (now.second - temp.second) < 0:
-          now.second += 60
-          insert_time = now.second - temp.second
+          insert_time = now.second - temp.second + 60
         else:
           insert_time = now.second - temp.second
         temp = now
-        aa = str(insert_time)
-        cursor.execute("INSERT INTO eye_tracking (time_interval) VALUES(%s)", aa)
+        ss = str(insert_time)
+        cursor.execute("INSERT INTO eye_tracking (time_interval) VALUES(%s)", [ss])
         db.commit()
         print(insert_time, type(insert_time))
         status = 'close'
