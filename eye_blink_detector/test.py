@@ -5,10 +5,10 @@ from keras.models import load_model
 from datetime import datetime
 import MySQLdb
 
-db = MySQLdb.connect(db="eye_tracking", host="localhost", user="eye_tracking", passwd="1234",
+db = MySQLdb.connect(db="grs", host="grs-js.cjidgocmm9f1.us-east-1.rds.amazonaws.com",port=3306,  user="grs", passwd="grs1234!",
 charset='utf8')
 cursor = db.cursor()
-
+temp = datetime.now()
 
 IMG_SIZE = (34, 26)
 
@@ -41,14 +41,14 @@ def crop_eye(img, eye_points):
 # cap = cv2.VideoCapture('videos/2.mp4')
 cap = cv2.VideoCapture(0)
 status = 'start'
-
-frame_size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-              int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-print('frame_size = ', frame_size)
-
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-
-out1 = cv2.VideoWriter('record0.mp4', fourcc, 20.0, frame_size)
+#
+# frame_size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+#               int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+# print('frame_size = ', frame_size)
+#
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+#
+# out1 = cv2.VideoWriter('record0.mp4', fourcc, 20.0, frame_size)
 
 while cap.isOpened():
   ret, img_ori = cap.read()
@@ -96,12 +96,28 @@ while cap.isOpened():
     cv2.putText(img, state_l, tuple(eye_rect_l[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
     cv2.putText(img, state_r, tuple(eye_rect_r[0:2]), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
 
+
+    def time_interval(datetime_now):
+      time_str = str(datetime_now)
+      second = float(time_str.split(' ')[1].split(':')[2])
+      return second
+
+
+
     if (pred_l <= 0.1 and pred_r <= 0.1):
       if (status == 'open'):
+        # 눈깜빡했을 때 실행
         now = datetime.now()
-        print(now)
-        cursor.execute("INSERT INTO eye_date_db (Date, Test) VALUES(%s, %s)",(now,1))
+        if (now.second - temp.second) < 0:
+          now.second += 60
+          insert_time = now.second - temp.second
+        else:
+          insert_time = now.second - temp.second
+        temp = now
+        aa = str(insert_time)
+        cursor.execute("INSERT INTO eye_tracking (time_interval) VALUES(%s)", aa)
         db.commit()
+        print(insert_time, type(insert_time))
         status = 'close'
     elif (pred_l >= 0.5 and pred_r >= 0.5):
       status = 'open'
