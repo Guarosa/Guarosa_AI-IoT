@@ -16,17 +16,17 @@ PubSubClient client(espClient);
 
 int echoPin = 4;
 int triggerPin = 5;
+int relaypin = 6;
 
-void callback(char *topic, byte *payload, unsigned int length) {
+void callback(char *topic, byte*payload, unsigned int length) {
     payload[length] = NULL;
     char *message = payload;
 
-    if (strcmp("1", message) == 0) {
-        digitalWrite(13, HIGH);
-    } else {
-        digitalWrite(13, LOW);
+    if (strcmp("1", message) == 0) { // 여기 가습기 작동
+        digitalWrite(relaypin,HIGH);     // 1채널 릴레이 ON
+        delay(10000);
+        digitalWrite(relaypin,LOW);      // 1채널 릴레이 OFF
     }
-
     Serial.print(topic);
     Serial.print(" : ");
     Serial.println(message);
@@ -80,6 +80,7 @@ void setup() {
     mqtt_init();
     pinMode(13, OUTPUT);
     digitalWrite(13, LOW);
+    pinMode(relaypin,OUTPUT); 
 }
 
 void loop() {
@@ -89,7 +90,7 @@ void loop() {
     digitalWrite(triggerPin, LOW);
     // echo 핀 입력으로부터 거리를 cm 단위로 계산
     int distance = pulseIn(echoPin, HIGH) / 58;
-    Serial.println("Distance(cm) = " + String(distance));
+    // Serial.println("Distance(cm) = " + String(distance));
     delay(1000);
 
     // 거리값이 10cm 이하
