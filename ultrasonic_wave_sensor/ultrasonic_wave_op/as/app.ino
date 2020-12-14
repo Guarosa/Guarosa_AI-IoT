@@ -17,6 +17,7 @@ PubSubClient client(espClient);
 int echoPin = 4;
 int triggerPin = 5;
 int relaypin = 6;
+int relaypin2 = 9;
 
 void callback(char *topic, byte*payload, unsigned int length) {
     payload[length] = NULL;
@@ -24,6 +25,9 @@ void callback(char *topic, byte*payload, unsigned int length) {
 
     if (strcmp("1", message) == 0) { // 여기 가습기 작동
         digitalWrite(relaypin,HIGH);     // 1채널 릴레이 ON
+        digitalWrite(relaypin2,HIGH);
+        delay(1000);
+        digitalWrite(relaypin2,LOW);
         delay(10000);
         digitalWrite(relaypin,LOW);      // 1채널 릴레이 OFF
     }
