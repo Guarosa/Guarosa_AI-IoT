@@ -7,7 +7,7 @@
 //SoftwareSerial softSerial(2, 3);           // RX, TX
 const char ssid[] = "Campus7_Room3_2.4";               // 네트워크 SSID
 const char password[] = "12345678";       // 비밀번호
-const char mqtt_server[] = "192.168.0.121"; // 서버 주소
+const char mqtt_server[] = "192.168.0.120"; // 서버 주소
 
 // MQTT용 WiFi 클라이언트 객체 초기화
 WifiUtil wifi(2, 3);
@@ -17,19 +17,21 @@ PubSubClient client(espClient);
 int echoPin = 4;
 int triggerPin = 5;
 int relaypin = 6;
-int relaypin2 = 9;
+int relaypin2 = 10;
 
 void callback(char *topic, byte*payload, unsigned int length) {
     payload[length] = NULL;
     char *message = payload;
 
     if (strcmp("1", message) == 0) { // 여기 가습기 작동
-        digitalWrite(relaypin,HIGH);     // 1채널 릴레이 ON
+        // digitalWrite(relaypin,HIGH);     // 1채널 릴레이 ON
+        digitalWrite(relaypin,HIGH);
+        delay(1000);
         digitalWrite(relaypin2,HIGH);
         delay(1000);
         digitalWrite(relaypin2,LOW);
         delay(10000);
-        digitalWrite(relaypin,LOW);      // 1채널 릴레이 OFF
+        digitalWrite(relaypin,LOW); // 1채널 릴레이 OFF
     }
     Serial.print(topic);
     Serial.print(" : ");
@@ -51,7 +53,7 @@ void reconnect() {
         if (client.connect("ESP8266Client")) {
             Serial.println("connected");
             // subscriber로 등록
-            client.subscribe("iot/home/#",1);  // 구독 신청
+            client.subscribe("iot/human1/#",1);  // 구독 신청
         } else {
             Serial.print("failed, rc=");
             Serial.print(client.state());
@@ -85,6 +87,7 @@ void setup() {
     pinMode(13, OUTPUT);
     digitalWrite(13, LOW);
     pinMode(relaypin,OUTPUT); 
+    pinMode(relaypin2,OUTPUT); 
 }
 
 void loop() {
