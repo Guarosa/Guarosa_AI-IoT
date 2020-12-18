@@ -1,5 +1,5 @@
 {
     "board": "arduino:avr:uno",
     "port": "COM3",
-    "sketch": "as/app.ino"
+    "sketch": "mqtt_op/app.ino"
 }

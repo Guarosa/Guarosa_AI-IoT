@@ -14,24 +14,20 @@ WifiUtil wifi(2, 3);
 WiFiEspClient espClient;
 PubSubClient client(espClient);
 
-int echoPin = 4;
-int triggerPin = 5;
 int relaypin = 6;
 int relaypin2 = 10;
-int ledpin = 12;
 
 void callback(char *topic, byte*payload, unsigned int length) {
     payload[length] = NULL;
     char *message = payload;
 
     if (strcmp("1", message) == 0) { // 여기 가습기 작동
-        // digitalWrite(relaypin,HIGH);     // 1채널 릴레이 ON
         digitalWrite(relaypin,HIGH);
         delay(1000);
-        digitalWrite(relaypin2,HIGH);
-        delay(500);
-        digitalWrite(relaypin2,LOW);
-        delay(10000);
+        // digitalWrite(relaypin2,HIGH);
+        // delay(500);
+        // digitalWrite(relaypin2,LOW);
+        // delay(10000);
         digitalWrite(relaypin,LOW); // 1채널 릴레이 OFF
     }
     Serial.print(topic);
@@ -65,55 +61,20 @@ void reconnect() {
 }
 
 void publish() {
-    char message[10];
-    // int readVal = analogRead(pSensor);
-    // dtostrf(readVal, 5, 2, message);
-    // 토픽 발행
-    // client.publish("iot/home/Illuminance", message);
 
 }
 
-// 2초 간격으로 publish
-SimpleTimer timer;
-
-
 void setup() {
     Serial.begin(9600);
-    pinMode(echoPin, INPUT);
-    pinMode(triggerPin, OUTPUT);
-    pinMode(ledpin, OUTPUT);
-    digitalWrite(ledpin, false);
     wifi.init(ssid, password);
     mqtt_init();
-    // pinMode(ledpin, OUTPUT);
-    digitalWrite(ledpin, LOW);
     pinMode(relaypin,OUTPUT); 
     pinMode(relaypin2,OUTPUT); 
 }
 
 void loop() {
-    // trigger 핀으로 10us의 펄스를 발생
-    digitalWrite(triggerPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(triggerPin, LOW);
-    // echo 핀 입력으로부터 거리를 cm 단위로 계산
-    int distance = pulseIn(echoPin, HIGH) / 58;
-    Serial.println("Distance(cm) = " + String(distance));
-    delay(1000);
-
-    거리값이 45cm 이하
-    if (distance < 45){
-        digitalWrite(ledpin, HIGH); // LED제어
-    }
-    else
-    {
-        digitalWrite(ledpin, LOW); // LED제어
-    }
-
     if (!client.connected()) {  // MQTT가 연결 X
         reconnect();
     }
-    client.loop();
-    timer.run();
-    
+    client.loop();   
 }
